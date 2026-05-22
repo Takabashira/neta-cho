@@ -241,3 +241,164 @@ function setupSheet(sheet, headers, widths) {
   sheet.setFrozenRows(1);
   widths.forEach((w, i) => sheet.setColumnWidth(i + 1, w));
 }
+
+// =====================================================
+// マニュアルシートを自動生成（一度だけ実行）
+// Apps Scriptエディタで setupManual を選択して▶実行
+// =====================================================
+function setupManual() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+
+  // 既存シートを削除して再生成
+  const existing = ss.getSheetByName('📖 マニュアル');
+  if (existing) ss.deleteSheet(existing);
+  const sheet = ss.insertSheet('📖 マニュアル', 0);
+
+  sheet.setColumnWidth(1, 200);
+  sheet.setColumnWidth(2, 480);
+  sheet.hideColumns(3, sheet.getMaxColumns() - 2);
+
+  // ── ヘルパー ──
+  const BLUE    = '#1a73e8';
+  const LBLUE   = '#e8f0fe';
+  const DGRAY   = '#3c4043';
+  const LGRAY   = '#f8f9fa';
+  const WHITE   = '#ffffff';
+
+  let r = 1;
+
+  function title(text) {
+    const rng = sheet.getRange(r, 1, 1, 2).merge();
+    rng.setValue(text)
+       .setBackground(BLUE).setFontColor(WHITE)
+       .setFontWeight('bold').setFontSize(15)
+       .setHorizontalAlignment('center').setVerticalAlignment('middle');
+    sheet.setRowHeight(r, 44);
+    r++;
+  }
+
+  function section(text) {
+    const rng = sheet.getRange(r, 1, 1, 2).merge();
+    rng.setValue(text)
+       .setBackground(LBLUE).setFontColor(BLUE)
+       .setFontWeight('bold').setFontSize(11);
+    sheet.setRowHeight(r, 30);
+    r++;
+  }
+
+  function row(label, value, alt) {
+    sheet.getRange(r, 1).setValue(label).setFontWeight('bold').setFontColor(DGRAY).setFontSize(10);
+    sheet.getRange(r, 2).setValue(value).setFontColor(DGRAY).setFontSize(10).setWrap(true);
+    if (alt) sheet.getRange(r, 1, 1, 2).setBackground(LGRAY);
+    sheet.setRowHeight(r, 22);
+    r++;
+  }
+
+  function blank() { sheet.setRowHeight(r, 10); r++; }
+
+  function note(text) {
+    const rng = sheet.getRange(r, 1, 1, 2).merge();
+    rng.setValue(text).setFontColor('#80868b').setFontSize(9).setFontStyle('italic');
+    sheet.setRowHeight(r, 18);
+    r++;
+  }
+
+  // ══════════════════════════════════════
+  title('📖 ネタ帳システム マニュアル');
+  row('最終更新', Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy年MM月dd日'), false);
+  row('アプリURL', 'https://takabashira.github.io/neta-cho/', true);
+  blank();
+
+  // ── 目的・目標 ──
+  section('🎯 目的・目標');
+  row('ビジネス目的', '宮古島移住・起業のしくじり実録を発信 → 月30万円の利益を得る', false);
+  row('収益モデル', 'noteコミュニティ 3,000円 × 80人 ＋ 有料マガジン 500円 × 120人', true);
+  row('達成期間', '1年以内（2027年5月目標）', false);
+  blank();
+
+  // ── キャラクター設定 ──
+  section('🎭 キャラクター設定');
+  row('発信者名', '岡村 ｜ 宮古島しくじり社長', false);
+  row('Voicyチャンネル名', '宮古島しくじり経営ラジオ', true);
+  row('一次ターゲット', '宮古島でこれから挑戦したいと思っている方', false);
+  row('二次ターゲット', '宮古島に興味がある方', true);
+  row('発信テーマ', '民泊・不動産・移住・経営・島暮らしのしくじり実録', false);
+  row('トーン', '親しみやすい・話し言葉・失敗を包み隠さない', true);
+  row('プロフィール文',
+    '宮古島でジム・コインランドリー・宿泊施設を立ち上げた経営者。\n「宮古島で何かやりたい」あなたに知っておいてほしい失敗を全部話します。\n民泊申請の壁、不動産の落とし穴、島での経営のしくじり。\n宮古島で挑戦する人の転ばぬ先の杖になりたい。', false);
+  sheet.setRowHeight(r - 1, 80);
+  blank();
+
+  // ── アカウント一覧 ──
+  section('📱 アカウント一覧と役割');
+  row('Voicy（新規作成）', '【集客エンジン①】無料音声配信。入り口トークでnoteへ誘導。チャンネル名：宮古島しくじり経営ラジオ', false);
+  row('X / Twitter（新規作成）', '【集客エンジン②】Voicy配信シェア・日常発信。Voicyと連動', true);
+  row('note（新規作成）', '【収益の核】有料マガジン・コミュニティの拠点。アカウント名：岡村｜宮古島しくじり社長', false);
+  row('note（個人 miyakonori）', '【別運用】映画・漫画・日常。ビジネス発信と絶対に混ぜない', true);
+  row('Instagram（既存）', '【別事業用】AQXIA・AIR・283の施設アカウント。このビジネスとは分離', false);
+  blank();
+
+  // ── ワークフロー ──
+  section('🔄 コンテンツ制作ワークフロー');
+  row('Step 1｜随時（30秒）', 'アイデアを思いついたら → ネタ帳アプリで即保存', false);
+  row('Step 2｜週1回', 'ネタ一覧を見て、今週記事にするネタを1つ選ぶ', true);
+  row('Step 3｜週1回', '「コンテンツ化」ボタンを押す → Google Docが自動生成される', false);
+  row('Step 4｜週1回（30分）', 'DocをClaude AIと一緒に仕上げる（note本文 ＋ Voicy台本）', true);
+  row('Step 5｜週1回（20分）', 'Voicyで入り口トークを収録・投稿', false);
+  row('Step 6｜週1回', 'noteに有料記事として公開 → URLをコンテンツ管理シートに記録', true);
+  blank();
+
+  // ── 毎日のルーティン ──
+  section('📅 毎日のルーティン');
+  row('毎日（5分）', 'ネタ帳アプリでアイデアを保存。思いついたらすぐ開く', false);
+  row('週1回（20分）', 'Voicy収録・投稿（記事の入り口トーク）', true);
+  row('週1回（30分）', 'Claudeと記事作成 → noteに投稿 → URLを記録', false);
+  row('月1回（10分）', 'コンテンツ管理シートで進捗確認・翌月の計画', true);
+  blank();
+
+  // ── 成長フェーズ ──
+  section('📈 成長フェーズ');
+  row('フェーズ1（1〜3ヶ月）', 'Voicy毎日配信・note無料記事10本・フォロワー獲得期', false);
+  row('フェーズ2（4〜6ヶ月）', 'note有料マガジン開始（月500円）・読者50〜100人目標', true);
+  row('フェーズ3（7〜12ヶ月）', 'コミュニティ開始（月3,000円）・80人達成で月30万円達成', false);
+  blank();
+
+  // ── ネタ帳シートの使い方 ──
+  section('📋 ネタ帳シートの列説明');
+  note('→ 「ネタ帳」シートを参照');
+  row('日時', 'アプリが自動入力。変更不要', false);
+  row('キーワード', 'ネタのテーマ・タイトル案。記事タイトルの元になる', true);
+  row('ジャンル', '移住 / 不動産 / 民泊 / 経営 / 島暮らし / その他', false);
+  row('優先度', '高・中・低。次に記事化するネタを選ぶ目安', true);
+  row('メモ', '思いついた補足・エピソード・費用・期間など', false);
+  row('ステータス', 'ネタ → 作成中 → 完成 → Voicy済み → 公開済み　（アプリから変更可）', true);
+  blank();
+
+  // ── コンテンツ管理シートの使い方 ──
+  section('📁 コンテンツ管理シートの列説明');
+  note('→ 「コンテンツ管理」シートを参照');
+  row('作成日', '「コンテンツ化」した日。自動入力', false);
+  row('タイトル', '記事タイトル（ネタのキーワードから自動入力）', true);
+  row('ジャンル', 'ネタ帳から引き継がれる', false);
+  row('ドキュメントURL', 'Google DocのURL。クリックで記事を開ける（自動生成）', true);
+  row('noteステータス', '下書き → 完成 → 公開済み　（アプリから変更可）', false);
+  row('note URL', 'noteに公開したあとURLを貼る', true);
+  row('note公開日', '公開した日付を記録', false);
+  row('Voicyステータス', '未収録 → 収録済み → 公開済み　（アプリから変更可）', true);
+  row('Voicy URL', 'Voicyに投稿したあとURLを貼る', false);
+  row('Voicy公開日', '収録・公開した日付を記録', true);
+  row('有料/無料', 'note記事が有料か無料か', false);
+  row('メモ', '補足・読者の反応・気づきなど', true);
+  blank();
+
+  // ── 最初に出すべき記事 ──
+  section('✍️ 最初に出すべき記事候補（参考）');
+  row('候補①', '宮古島で民泊を申請して詰まった全記録（費用・期間・手順）', false);
+  row('候補②', '宮古島の不動産を買って後悔したこと', true);
+  row('候補③', '宮古島で事業を始める前に知っておきたかった5つのこと', false);
+  row('選ぶ基準', '「一番スラスラ書けそうなもの」から始める。完璧より続けることが大事', true);
+  blank();
+
+  Logger.log('✅ マニュアルシートを作成しました（' + (r-1) + '行）');
+  SpreadsheetApp.getUi().alert('✅ マニュアルシートを作成しました！\n「📖 マニュアル」シートを確認してください。');
+}
