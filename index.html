@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ネタ帳">
+  <title>ネタ帳</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
+      background: #f2f2f7;
+      min-height: 100vh;
+      padding: 0 16px calc(env(safe-area-inset-bottom, 0px) + 32px);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: calc(env(safe-area-inset-top, 0px) + 20px) 0 16px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1c1c1e;
+    }
+
+    .sheet-link {
+      font-size: 14px;
+      color: #007AFF;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    /* ---- Card ---- */
+    .card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .field {
+      padding: 14px 16px;
+      border-bottom: 0.5px solid #e5e5ea;
+    }
+    .field:last-child { border-bottom: none; }
+
+    .field-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #8e8e93;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .field input[type="text"],
+    .field textarea {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 17px;
+      font-family: inherit;
+      color: #1c1c1e;
+      background: transparent;
+      caret-color: #007AFF;
+    }
+
+    .field textarea {
+      resize: none;
+      height: 72px;
+      line-height: 1.5;
+    }
+
+    ::placeholder { color: #c7c7cc; }
+
+    /* ---- Pills ---- */
+    .pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      padding: 7px 14px;
+      border-radius: 20px;
+      border: 1.5px solid #e5e5ea;
+      background: white;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      color: #3c3c43;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+
+    .pill.selected {
+      border-color: #007AFF;
+      background: #007AFF;
+      color: white;
+    }
+
+    /* ---- Save button ---- */
+    .save-btn {
+      display: block;
+      width: 100%;
+      margin-top: 16px;
+      padding: 16px;
+      background: #007AFF;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 17px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .save-btn:active  { opacity: 0.85; transform: scale(0.98); }
+    .save-btn:disabled { opacity: 0.4; }
+
+    /* ---- Recent ---- */
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #8e8e93;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 24px 0 8px 4px;
+    }
+
+    .recent-item {
+      background: white;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .recent-keyword {
+      font-size: 15px;
+      color: #1c1c1e;
+      flex: 1;
+      margin-right: 10px;
+    }
+
+    .recent-badge {
+      font-size: 12px;
+      color: #8e8e93;
+      background: #f2f2f7;
+      padding: 3px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #c7c7cc;
+      font-size: 15px;
+      padding: 20px;
+    }
+
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 30px);
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: rgba(28, 28, 30, 0.9);
+      color: white;
+      padding: 12px 22px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 500;
+      white-space: nowrap;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 999;
+      pointer-events: none;
+    }
+    .toast.visible { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>📝 ネタ帳</h1>
+    <a id="sheet-link" href="#" target="_blank" class="sheet-link">スプレッドシート →</a>
+  </div>
+
+  <form id="neta-form">
+    <div class="card">
+
+      <div class="field">
+        <div class="field-label">キーワード</div>
+        <input
+          type="text"
+          id="keyword"
+          placeholder="例：民泊申請で消防に詰まった話"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          required
+        >
+      </div>
+
+      <div class="field">
+        <div class="field-label">ジャンル</div>
+        <div class="pills" id="genre-pills">
+          <button type="button" class="pill selected" data-val="移住">移住</button>
+          <button type="button" class="pill" data-val="不動産">不動産</button>
+          <button type="button" class="pill" data-val="民泊">民泊</button>
+          <button type="button" class="pill" data-val="経営">経営</button>
+          <button type="button" class="pill" data-val="島暮らし">島暮らし</button>
+          <button type="button" class="pill" data-val="その他">その他</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">優先度</div>
+        <div class="pills" id="priority-pills">
+          <button type="button" class="pill" data-val="高">🔴 高</button>
+          <button type="button" class="pill selected" data-val="中">🟡 中</button>
+          <button type="button" class="pill" data-val="低">🟢 低</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">メモ（任意）</div>
+        <textarea
+          id="memo"
+          placeholder="思いついたことを自由に…"
+        ></textarea>
+      </div>
+
+    </div>
+
+    <button type="submit" class="save-btn" id="save-btn">保存する</button>
+  </form>
+
+  <p class="section-title">直近の保存</p>
+  <div id="recent-list"></div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // =====================================================
+    // ▼ ここを設定してください
+    // =====================================================
+    const APPS_SCRIPT_URL  = 'https://script.google.com/macros/s/AKfycbzoeQtnPFu_bjT9QDYqlsIdabUhMprIMRt7U9GvWEUUFgh89biQ73qZeXhUmASYj4ei6A/exec';
+    const SPREADSHEET_URL  = 'https://docs.google.com/spreadsheets/d/14XxhaLyv6VU5F8fiZTRg1_vfIah7gimZMNXZ3EC7hak/edit';
+    // =====================================================
+
+    document.getElementById('sheet-link').href = SPREADSHEET_URL;
+
+    // --- State ---
+    let genre    = '移住';
+    let priority = '中';
+
+    // --- Pills ---
+    function setupPills(groupId, onChange) {
+      document.getElementById(groupId).addEventListener('click', e => {
+        const pill = e.target.closest('.pill');
+        if (!pill) return;
+        document.querySelectorAll(`#${groupId} .pill`).forEach(p => p.classList.remove('selected'));
+        pill.classList.add('selected');
+        onChange(pill.dataset.val);
+      });
+    }
+    setupPills('genre-pills',    v => genre    = v);
+    setupPills('priority-pills', v => priority = v);
+
+    // --- Recent (localStorage) ---
+    const RECENT_KEY = 'neta_recent_v1';
+
+    function getRecent() {
+      try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); }
+      catch { return []; }
+    }
+
+    function pushRecent(item) {
+      const list = [item, ...getRecent()].slice(0, 5);
+      localStorage.setItem(RECENT_KEY, JSON.stringify(list));
+      renderRecent();
+    }
+
+    function esc(str) {
+      return String(str).replace(/[&<>"']/g, c =>
+        ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])
+      );
+    }
+
+    function renderRecent() {
+      const el    = document.getElementById('recent-list');
+      const items = getRecent();
+      if (!items.length) {
+        el.innerHTML = '<div class="empty-state">まだ保存されていません</div>';
+        return;
+      }
+      el.innerHTML = items.map(i => `
+        <div class="recent-item">
+          <span class="recent-keyword">${esc(i.keyword)}</span>
+          <span class="recent-badge">${esc(i.genre)}</span>
+        </div>
+      `).join('');
+    }
+
+    // --- Toast ---
+    let toastTimer;
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('visible');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('visible'), 2500);
+    }
+
+    // --- Submit ---
+    document.getElementById('neta-form').addEventListener('submit', async e => {
+      e.preventDefault();
+
+      const keyword = document.getElementById('keyword').value.trim();
+      if (!keyword) { showToast('キーワードを入力してください'); return; }
+
+      const btn = document.getElementById('save-btn');
+      btn.disabled    = true;
+      btn.textContent = '保存中…';
+
+      const body = new URLSearchParams({
+        keyword,
+        genre,
+        priority,
+        memo: document.getElementById('memo').value.trim()
+      });
+
+      try {
+        // no-cors: レスポンスは読めないが Apps Script 側で保存される
+        await fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body });
+
+        pushRecent({ keyword, genre });
+        showToast('✅ 保存しました！');
+
+        document.getElementById('keyword').value = '';
+        document.getElementById('memo').value    = '';
+
+      } catch (err) {
+        console.error(err);
+        showToast('❌ エラーが発生しました');
+      } finally {
+        btn.disabled    = false;
+        btn.textContent = '保存する';
+      }
+    });
+
+    // --- Init ---
+    renderRecent();
+    document.getElementById('keyword').focus();
+  </script>
+</body>
+</html>

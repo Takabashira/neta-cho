@@ -1,0 +1,11 @@
+{
+  "name": "ネタ帳",
+  "short_name": "ネタ帳",
+  "description": "コンテンツアイデアをすばやく保存",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f2f2f7",
+  "theme_color": "#007AFF",
+  "lang": "ja",
+  "icons": []
+}
