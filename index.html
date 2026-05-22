@@ -9,327 +9,210 @@
   <title>ネタ帳</title>
   <link rel="manifest" href="manifest.json">
   <style>
-    /* ============================================================
-       CSS Variables
-    ============================================================ */
     :root {
-      --bg:      #f2f2f7;
-      --card:    #ffffff;
-      --text:    #1c1c1e;
-      --text2:   #8e8e93;
-      --sep:     rgba(60,60,67,.18);
-      --accent:  #007AFF;
-      --success: #34C759;
-      --warn:    #FF9500;
-      --danger:  #FF3B30;
-      --purple:  #AF52DE;
-      --tab-h:   49px;
-      --st:      env(safe-area-inset-top,    0px);
-      --sb:      env(safe-area-inset-bottom, 0px);
+      --bg: #f2f2f7; --card: #fff; --text: #1c1c1e; --text2: #8e8e93;
+      --sep: rgba(60,60,67,.18); --accent: #007AFF;
+      --success: #34C759; --warn: #FF9500; --danger: #FF3B30; --purple: #AF52DE;
+      --tab-h: 49px;
+      --st: env(safe-area-inset-top,0px); --sb: env(safe-area-inset-bottom,0px);
     }
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme]) {
-        --bg: #000; --card: #1c1c1e; --text: #fff; --sep: rgba(84,84,88,.65);
-      }
-    }
-    [data-theme="dark"]  { --bg: #000; --card: #1c1c1e; --text: #fff; --sep: rgba(84,84,88,.65); }
-    [data-theme="light"] { --bg: #f2f2f7; --card: #fff; --text: #1c1c1e; --sep: rgba(60,60,67,.18); }
+    @media (prefers-color-scheme:dark){ :root:not([data-theme]){ --bg:#000;--card:#1c1c1e;--text:#fff;--sep:rgba(84,84,88,.65); } }
+    [data-theme="dark"]  { --bg:#000;--card:#1c1c1e;--text:#fff;--sep:rgba(84,84,88,.65); }
+    [data-theme="light"] { --bg:#f2f2f7;--card:#fff;--text:#1c1c1e;--sep:rgba(60,60,67,.18); }
 
-    /* ============================================================
-       Reset / Base
-    ============================================================ */
-    *, *::before, *::after {
-      box-sizing: border-box; margin: 0; padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      height: 100dvh;
-      overflow: hidden;
-      transition: background .3s, color .3s;
-    }
+    *,*::before,*::after{ box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent; }
+    body{ font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans',sans-serif;background:var(--bg);color:var(--text);height:100dvh;overflow:hidden;transition:background .3s,color .3s; }
 
-    /* ============================================================
-       Header
-    ============================================================ */
-    .header {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      height: calc(var(--st) + 52px);
-      padding: var(--st) 16px 0;
-      display: flex; align-items: center; justify-content: space-between;
-      background: var(--bg);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border-bottom: .5px solid var(--sep);
-      transition: background .3s;
+    /* Header */
+    .header{
+      position:fixed;top:0;left:0;right:0;z-index:100;
+      height:calc(var(--st) + 52px);padding:var(--st) 16px 0;
+      display:flex;align-items:center;justify-content:space-between;
+      background:var(--bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+      border-bottom:.5px solid var(--sep);transition:background .3s;
     }
-    .header h1 { font-size: 20px; font-weight: 700; }
-    .header-right { display: flex; gap: 10px; }
-    .icon-btn {
-      width: 34px; height: 34px; border-radius: 50%; border: none;
-      background: var(--card); color: var(--accent); cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,.08);
-      transition: opacity .15s, background .3s;
+    .header h1{ font-size:20px;font-weight:700; }
+    .header-right{ display:flex;gap:10px; }
+    .icon-btn{
+      width:34px;height:34px;border-radius:50%;border:none;
+      background:var(--card);color:var(--accent);cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 1px 3px rgba(0,0,0,.08);transition:opacity .15s,background .3s;
     }
-    .icon-btn:active { opacity: .7; }
+    .icon-btn:active{ opacity:.7; }
 
-    /* ============================================================
-       Pages
-    ============================================================ */
-    .page {
-      position: fixed;
-      top: calc(var(--st) + 52px);
-      bottom: calc(var(--sb) + var(--tab-h));
-      left: 0; right: 0;
-      overflow-y: auto; -webkit-overflow-scrolling: touch;
-      padding: 16px 16px 8px;
-      display: none;
+    /* Pages */
+    .page{
+      position:fixed;
+      top:calc(var(--st) + 52px);
+      bottom:calc(var(--sb) + var(--tab-h));
+      left:0;right:0;
+      overflow-y:auto;-webkit-overflow-scrolling:touch;
+      padding:16px 16px 8px;display:none;
     }
-    .page.active { display: block; }
+    .page.active{ display:block; }
 
-    /* ============================================================
-       Tab bar
-    ============================================================ */
-    .tab-bar {
-      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-      height: calc(var(--sb) + var(--tab-h));
-      padding-bottom: var(--sb);
-      display: flex;
-      background: var(--bg);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border-top: .5px solid var(--sep);
-      transition: background .3s;
+    /* Tab bar */
+    .tab-bar{
+      position:fixed;bottom:0;left:0;right:0;z-index:100;
+      height:calc(var(--sb) + var(--tab-h));padding-bottom:var(--sb);
+      display:flex;background:var(--bg);
+      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+      border-top:.5px solid var(--sep);transition:background .3s;
     }
-    .tab-btn {
-      flex: 1; border: none; background: none; cursor: pointer;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 3px; padding-top: 8px;
-      font-size: 10px; font-weight: 500; font-family: inherit;
-      color: var(--text2); transition: color .2s;
+    .tab-btn{
+      flex:1;border:none;background:none;cursor:pointer;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:3px;padding-top:8px;
+      font-size:10px;font-weight:500;font-family:inherit;
+      color:var(--text2);transition:color .2s;
     }
-    .tab-btn.active { color: var(--accent); }
-    .tab-btn svg { width: 24px; height: 24px; transition: transform .2s; }
-    .tab-btn.active svg { transform: scale(1.1); }
+    .tab-btn.active{ color:var(--accent); }
+    .tab-btn svg{ width:24px;height:24px;transition:transform .2s; }
+    .tab-btn.active svg{ transform:scale(1.1); }
 
-    /* ============================================================
-       Card / Fields
-    ============================================================ */
-    .card {
-      background: var(--card); border-radius: 16px; overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,.06); margin-bottom: 14px;
-      transition: background .3s;
+    /* Card / Field */
+    .card{ background:var(--card);border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:14px;transition:background .3s; }
+    .field{ padding:13px 16px;border-bottom:.5px solid var(--sep); }
+    .field:last-child{ border-bottom:none; }
+    .field-label{ font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px; }
+    .kw-row{ display:flex;align-items:center;gap:8px; }
+    .field input[type="text"],.field textarea{
+      flex:1;border:none;outline:none;font-size:17px;
+      font-family:inherit;color:var(--text);background:transparent;caret-color:var(--accent);
     }
-    .field { padding: 13px 16px; border-bottom: .5px solid var(--sep); }
-    .field:last-child { border-bottom: none; }
-    .field-label {
-      font-size: 11px; font-weight: 600; color: var(--text2);
-      letter-spacing: .5px; text-transform: uppercase; margin-bottom: 7px;
-    }
-    .keyword-row { display: flex; align-items: center; gap: 8px; }
-    .field input[type="text"], .field textarea {
-      flex: 1; border: none; outline: none;
-      font-size: 17px; font-family: inherit;
-      color: var(--text); background: transparent; caret-color: var(--accent);
-    }
-    .field textarea { resize: none; height: 68px; line-height: 1.5; display: block; width: 100%; }
-    ::placeholder { color: var(--sep); }
+    .field textarea{ resize:none;height:68px;line-height:1.5;display:block;width:100%; }
+    ::placeholder{ color:var(--sep); }
 
-    /* ============================================================
-       Mic button
-    ============================================================ */
-    .mic-btn {
-      flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; border: none;
-      background: rgba(0,122,255,.1); color: var(--accent);
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: all .2s;
+    /* Mic */
+    .mic-btn{
+      flex-shrink:0;width:36px;height:36px;border-radius:50%;border:none;
+      background:rgba(0,122,255,.1);color:var(--accent);
+      cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;
     }
-    .mic-btn.recording {
-      background: var(--danger); color: #fff;
-      animation: mic-pulse 1.2s ease-in-out infinite;
-    }
-    @keyframes mic-pulse {
-      0%,100% { box-shadow: 0 0 0 0 rgba(255,59,48,.5); }
-      50%      { box-shadow: 0 0 0 8px rgba(255,59,48,0); }
+    .mic-btn.recording{ background:var(--danger);color:#fff;animation:mic-pulse 1.2s ease-in-out infinite; }
+    @keyframes mic-pulse{
+      0%,100%{ box-shadow:0 0 0 0 rgba(255,59,48,.5); }
+      50%{ box-shadow:0 0 0 8px rgba(255,59,48,0); }
     }
 
-    /* ============================================================
-       Pills
-    ============================================================ */
-    .pills { display: flex; flex-wrap: wrap; gap: 7px; }
-    .pill {
-      padding: 6px 13px; border-radius: 20px;
-      border: 1.5px solid var(--sep); background: transparent;
-      font-size: 14px; font-weight: 500; color: var(--text);
-      font-family: inherit; cursor: pointer; transition: all .15s;
-    }
-    .pill.selected { border-color: var(--accent); background: var(--accent); color: #fff; }
+    /* Pills */
+    .pills{ display:flex;flex-wrap:wrap;gap:7px; }
+    .pill{ padding:6px 13px;border-radius:20px;border:1.5px solid var(--sep);background:transparent;font-size:14px;font-weight:500;color:var(--text);font-family:inherit;cursor:pointer;transition:all .15s; }
+    .pill.selected{ border-color:var(--accent);background:var(--accent);color:#fff; }
 
-    /* ============================================================
-       Save button
-    ============================================================ */
-    .save-btn {
-      width: 100%; padding: 16px;
-      background: var(--accent); color: #fff; border: none;
-      border-radius: 14px; font-size: 17px; font-weight: 600;
-      font-family: inherit; cursor: pointer; margin-bottom: 20px;
-      transition: opacity .15s, transform .1s;
-    }
-    .save-btn:active  { opacity: .85; transform: scale(.98); }
-    .save-btn:disabled { opacity: .4; }
+    /* Save button */
+    .save-btn{ width:100%;padding:16px;background:var(--accent);color:#fff;border:none;border-radius:14px;font-size:17px;font-weight:600;font-family:inherit;cursor:pointer;margin-bottom:20px;transition:opacity .15s,transform .1s; }
+    .save-btn:active{ opacity:.85;transform:scale(.98); }
+    .save-btn:disabled{ opacity:.4; }
 
-    /* ============================================================
-       Section title
-    ============================================================ */
-    .section-title {
-      font-size: 13px; font-weight: 600; color: var(--text2);
-      text-transform: uppercase; letter-spacing: .5px;
-      margin: 4px 4px 10px;
-    }
+    /* Section title */
+    .section-title{ font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin:4px 4px 10px; }
 
-    /* ============================================================
-       Neta items (shared by recent + list)
-    ============================================================ */
-    .neta-item {
-      background: var(--card); border-radius: 13px; padding: 13px 14px;
-      margin-bottom: 9px; box-shadow: 0 1px 3px rgba(0,0,0,.06);
-      transition: background .3s;
-    }
-    .neta-top {
-      display: flex; justify-content: space-between;
-      align-items: flex-start; margin-bottom: 5px;
-    }
-    .neta-keyword {
-      font-size: 15px; font-weight: 500; color: var(--text);
-      flex: 1; margin-right: 8px; line-height: 1.4;
-    }
-    .badges { display: flex; gap: 5px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
-    .badge {
-      font-size: 11px; font-weight: 500; padding: 3px 8px;
-      border-radius: 6px; background: var(--bg); color: var(--text2);
-    }
-    /* Status colors */
-    .s-ネタ      { background: rgba(142,142,147,.15); color: var(--text2); }
-    .s-作成中    { background: rgba(0,122,255,.15);   color: var(--accent); }
-    .s-完成      { background: rgba(255,149,0,.15);   color: var(--warn); }
-    .s-Voicy済み { background: rgba(175,82,222,.15);  color: var(--purple); }
-    .s-公開済み  { background: rgba(52,199,89,.15);   color: var(--success); }
+    /* Filter bar */
+    .filter-bar{ display:flex;gap:6px;overflow-x:auto;padding-bottom:12px;-webkit-overflow-scrolling:touch;scrollbar-width:none; }
+    .filter-bar::-webkit-scrollbar{ display:none; }
+    .filter-chip{ flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--sep);background:none;font-size:13px;font-weight:500;color:var(--text2);font-family:inherit;cursor:pointer;transition:all .15s; }
+    .filter-chip.active{ border-color:var(--accent);background:rgba(0,122,255,.12);color:var(--accent); }
 
-    .neta-memo { font-size: 13px; color: var(--text2); margin-bottom: 7px; line-height: 1.4; }
-    .neta-bottom {
-      display: flex; justify-content: space-between; align-items: center; margin-top: 6px;
-    }
-    .neta-meta { font-size: 12px; color: var(--text2); }
-    .neta-actions { display: flex; gap: 6px; }
-    .act-btn {
-      font-size: 12px; padding: 4px 10px; border-radius: 8px;
-      border: 1px solid var(--sep); background: none;
-      color: var(--accent); font-family: inherit; font-weight: 500;
-      cursor: pointer; transition: opacity .15s;
-    }
-    .act-btn:active { opacity: .7; }
+    /* Neta / Content items */
+    .neta-item{ background:var(--card);border-radius:13px;padding:13px 14px;margin-bottom:9px;box-shadow:0 1px 3px rgba(0,0,0,.06);transition:background .3s; }
+    .neta-top{ display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px; }
+    .neta-kw{ font-size:15px;font-weight:500;color:var(--text);flex:1;margin-right:8px;line-height:1.4; }
+    .badges{ display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end; }
+    .badge{ font-size:11px;font-weight:500;padding:3px 8px;border-radius:6px;background:var(--bg);color:var(--text2); }
+    .s-ネタ       { background:rgba(142,142,147,.15);color:var(--text2); }
+    .s-作成中     { background:rgba(0,122,255,.15);color:var(--accent); }
+    .s-完成       { background:rgba(255,149,0,.15);color:var(--warn); }
+    .s-Voicy済み  { background:rgba(175,82,222,.15);color:var(--purple); }
+    .s-公開済み   { background:rgba(52,199,89,.15);color:var(--success); }
+    .s-下書き     { background:rgba(142,142,147,.15);color:var(--text2); }
+    .s-未収録     { background:rgba(142,142,147,.15);color:var(--text2); }
+    .s-収録済み   { background:rgba(175,82,222,.15);color:var(--purple); }
+    .s-有料       { background:rgba(255,149,0,.15);color:var(--warn); }
+    .s-無料       { background:rgba(52,199,89,.15);color:var(--success); }
 
-    /* ============================================================
-       Filter bar (一覧タブ)
-    ============================================================ */
-    .filter-bar {
-      display: flex; gap: 6px; overflow-x: auto;
-      padding-bottom: 12px; -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-    }
-    .filter-bar::-webkit-scrollbar { display: none; }
-    .filter-chip {
-      flex-shrink: 0; padding: 6px 14px; border-radius: 20px;
-      border: 1.5px solid var(--sep); background: none;
-      font-size: 13px; font-weight: 500; color: var(--text2);
-      font-family: inherit; cursor: pointer; transition: all .15s;
-    }
-    .filter-chip.active {
-      border-color: var(--accent);
-      background: rgba(0,122,255,.12); color: var(--accent);
-    }
+    .neta-memo{ font-size:13px;color:var(--text2);margin-bottom:7px;line-height:1.4; }
+    .neta-bottom{ display:flex;justify-content:space-between;align-items:center;margin-top:6px; }
+    .neta-meta{ font-size:12px;color:var(--text2); }
+    .neta-actions{ display:flex;gap:6px; }
+    .act-btn{ font-size:12px;padding:4px 10px;border-radius:8px;border:1px solid var(--sep);background:none;color:var(--accent);font-family:inherit;font-weight:500;cursor:pointer;transition:opacity .15s; }
+    .act-btn:active{ opacity:.7; }
+    .act-btn.primary{ background:var(--accent);color:#fff;border-color:var(--accent); }
 
-    /* ============================================================
-       Status modal
-    ============================================================ */
-    .overlay {
-      position: fixed; inset: 0; z-index: 200;
-      background: rgba(0,0,0,.45);
-      display: flex; align-items: flex-end;
-      opacity: 0; pointer-events: none;
-      transition: opacity .25s;
+    /* Content item (コンテンツ管理) */
+    .cont-item{ background:var(--card);border-radius:13px;padding:14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.06);transition:background .3s;cursor:pointer; }
+    .cont-title{ font-size:16px;font-weight:600;color:var(--text);margin-bottom:8px;line-height:1.4; }
+    .cont-row{ display:flex;justify-content:space-between;align-items:center;margin-bottom:6px; }
+    .cont-links{ display:flex;gap:8px;flex-wrap:wrap;margin-top:8px; }
+    .link-btn{
+      display:inline-flex;align-items:center;gap:5px;
+      font-size:12px;font-weight:500;padding:5px 10px;border-radius:8px;
+      text-decoration:none;border:1px solid var(--sep);color:var(--accent);
+      background:none;font-family:inherit;cursor:pointer;transition:opacity .15s;
     }
-    .overlay.open { opacity: 1; pointer-events: all; }
-    .sheet {
-      background: var(--card); border-radius: 20px 20px 0 0;
-      width: 100%; padding-bottom: calc(var(--sb) + 8px);
-      transform: translateY(100%);
-      transition: transform .32s cubic-bezier(.34,1.4,.64,1);
-    }
-    .overlay.open .sheet { transform: translateY(0); }
-    .sheet-handle {
-      width: 36px; height: 4px; background: var(--sep);
-      border-radius: 2px; margin: 12px auto 4px;
-    }
-    .sheet-title {
-      text-align: center; font-size: 13px; color: var(--text2);
-      font-weight: 500; padding: 6px 0 10px;
-    }
-    .status-opt {
-      display: flex; align-items: center; gap: 12px;
-      padding: 15px 20px; border: none; background: none;
-      width: 100%; text-align: left; font-size: 17px;
-      font-family: inherit; color: var(--text); cursor: pointer;
-      border-top: .5px solid var(--sep);
-    }
-    .status-opt:active { background: var(--bg); }
-    .status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .link-btn:active{ opacity:.7; }
+    .link-btn.filled{ background:rgba(0,122,255,.1);border-color:transparent; }
 
-    /* ============================================================
-       Empty / Spinner
-    ============================================================ */
-    .empty { text-align: center; padding: 48px 20px; color: var(--text2); }
-    .empty-icon { font-size: 42px; margin-bottom: 12px; }
-    .empty-text { font-size: 15px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .spinner {
-      width: 22px; height: 22px; margin: 32px auto;
-      border: 2.5px solid var(--sep); border-top-color: var(--accent);
-      border-radius: 50%; animation: spin .8s linear infinite;
-    }
+    /* Status modal */
+    .overlay{ position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s; }
+    .overlay.open{ opacity:1;pointer-events:all; }
+    .sheet{ background:var(--card);border-radius:20px 20px 0 0;width:100%;padding-bottom:calc(var(--sb) + 8px);transform:translateY(100%);transition:transform .32s cubic-bezier(.34,1.4,.64,1); }
+    .overlay.open .sheet{ transform:translateY(0); }
+    .sheet-handle{ width:36px;height:4px;background:var(--sep);border-radius:2px;margin:12px auto 4px; }
+    .sheet-title{ text-align:center;font-size:15px;color:var(--text);font-weight:600;padding:6px 16px 12px; }
+    .status-opt{ display:flex;align-items:center;gap:12px;padding:15px 20px;border:none;background:none;width:100%;text-align:left;font-size:17px;font-family:inherit;color:var(--text);cursor:pointer;border-top:.5px solid var(--sep); }
+    .status-opt:active{ background:var(--bg); }
+    .status-dot{ width:10px;height:10px;border-radius:50%;flex-shrink:0; }
 
-    /* ============================================================
-       Toast
-    ============================================================ */
-    .toast {
-      position: fixed;
-      bottom: calc(var(--sb) + var(--tab-h) + 14px);
-      left: 50%; transform: translateX(-50%) translateY(60px);
-      background: rgba(28,28,30,.9); color: #fff;
-      padding: 11px 20px; border-radius: 24px;
-      font-size: 15px; font-weight: 500; white-space: nowrap;
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      z-index: 300; pointer-events: none;
-      transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+    /* Content detail sheet */
+    .detail-sheet{ max-height:90dvh;overflow-y:auto; }
+    .detail-field{ padding:12px 16px;border-bottom:.5px solid var(--sep); }
+    .detail-field:last-child{ border-bottom:none; }
+    .detail-label{ font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px; }
+    .detail-input{
+      width:100%;border:none;outline:none;font-size:16px;
+      font-family:inherit;color:var(--text);background:transparent;caret-color:var(--accent);
     }
-    .toast.show { transform: translateX(-50%) translateY(0); }
+    input[type="date"].detail-input{ -webkit-appearance:none;appearance:none; }
+    .detail-select{ width:100%;border:none;outline:none;font-size:16px;font-family:inherit;color:var(--text);background:transparent;cursor:pointer; }
+    .detail-save{ width:calc(100% - 32px);margin:12px 16px;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer; }
+    .detail-save:active{ opacity:.85; }
+
+    /* Empty / Spinner */
+    .empty{ text-align:center;padding:48px 20px;color:var(--text2); }
+    .empty-icon{ font-size:42px;margin-bottom:12px; }
+    .empty-text{ font-size:15px; }
+    @keyframes spin{ to{ transform:rotate(360deg); } }
+    .spinner{ width:22px;height:22px;margin:32px auto;border:2.5px solid var(--sep);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite; }
+
+    /* Toast */
+    .toast{
+      position:fixed;bottom:calc(var(--sb) + var(--tab-h) + 14px);left:50%;
+      transform:translateX(-50%) translateY(60px);
+      background:rgba(28,28,30,.9);color:#fff;
+      padding:11px 20px;border-radius:24px;font-size:15px;font-weight:500;white-space:nowrap;
+      backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+      z-index:300;pointer-events:none;
+      transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+    }
+    .toast.show{ transform:translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
 
-<!-- ── Header ───────────────────────────────────────── -->
+<!-- Header -->
 <header class="header">
   <h1>📝 ネタ帳</h1>
   <div class="header-right">
     <a href="https://docs.google.com/spreadsheets/d/14XxhaLyv6VU5F8fiZTRg1_vfIah7gimZMNXZ3EC7hak/edit"
-       target="_blank" class="icon-btn" title="スプレッドシートを開く">
+       target="_blank" class="icon-btn" title="スプレッドシート">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
         <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
       </svg>
     </a>
-    <button class="icon-btn" id="theme-btn" title="テーマ切替">
+    <button class="icon-btn" id="theme-btn">
       <svg id="theme-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
       </svg>
@@ -337,28 +220,24 @@
   </div>
 </header>
 
-<!-- ── Page: 追加 ────────────────────────────────────── -->
+<!-- ===== Page: 追加 ===== -->
 <main class="page active" id="page-add">
   <form id="neta-form">
     <div class="card">
-
       <div class="field">
         <div class="field-label">キーワード</div>
-        <div class="keyword-row">
-          <input type="text" id="keyword"
-            placeholder="例：民泊申請で消防に詰まった話"
+        <div class="kw-row">
+          <input type="text" id="keyword" placeholder="例：民泊申請で消防に詰まった話"
             autocomplete="off" autocorrect="off" autocapitalize="off">
-          <button type="button" class="mic-btn" id="mic-btn" title="音声入力">
+          <button type="button" class="mic-btn" id="mic-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
               <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-              <line x1="12" y1="19" x2="12" y2="23"/>
-              <line x1="8" y1="23" x2="16" y2="23"/>
+              <line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
             </svg>
           </button>
         </div>
       </div>
-
       <div class="field">
         <div class="field-label">ジャンル</div>
         <div class="pills" id="genre-pills">
@@ -370,7 +249,6 @@
           <button type="button" class="pill" data-val="その他">その他</button>
         </div>
       </div>
-
       <div class="field">
         <div class="field-label">優先度</div>
         <div class="pills" id="priority-pills">
@@ -379,21 +257,18 @@
           <button type="button" class="pill" data-val="低">🟢 低</button>
         </div>
       </div>
-
       <div class="field">
         <div class="field-label">メモ（任意）</div>
         <textarea id="memo" placeholder="思いついたことを自由に…"></textarea>
       </div>
-
     </div>
     <button type="submit" class="save-btn" id="save-btn">保存する</button>
   </form>
-
   <p class="section-title">直近の保存</p>
   <div id="recent-list"></div>
 </main>
 
-<!-- ── Page: 一覧 ────────────────────────────────────── -->
+<!-- ===== Page: ネタ一覧 ===== -->
 <main class="page" id="page-list">
   <div class="filter-bar" id="filter-bar">
     <button class="filter-chip active" data-f="すべて">すべて</button>
@@ -406,14 +281,24 @@
   <div id="list-wrap"><div class="spinner"></div></div>
 </main>
 
-<!-- ── Tab bar ───────────────────────────────────────── -->
+<!-- ===== Page: コンテンツ ===== -->
+<main class="page" id="page-cont">
+  <div class="filter-bar" id="cont-filter-bar">
+    <button class="filter-chip active" data-f="すべて">すべて</button>
+    <button class="filter-chip" data-f="下書き">下書き</button>
+    <button class="filter-chip" data-f="完成">完成</button>
+    <button class="filter-chip" data-f="公開済み">公開済み</button>
+  </div>
+  <div id="cont-wrap"><div class="spinner"></div></div>
+</main>
+
+<!-- Tab bar -->
 <nav class="tab-bar">
   <button class="tab-btn active" data-tab="add">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <circle cx="12" cy="12" r="10"/>
       <line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
-    </svg>
-    追加
+    </svg>追加
   </button>
   <button class="tab-btn" data-tab="list">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -421,329 +306,370 @@
       <line x1="8" y1="18" x2="21" y2="18"/>
       <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/>
       <line x1="3" y1="18" x2="3.01" y2="18"/>
-    </svg>
-    一覧
+    </svg>ネタ一覧
+  </button>
+  <button class="tab-btn" data-tab="cont">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      <polyline points="10 9 9 9 8 9"/>
+    </svg>コンテンツ
   </button>
 </nav>
 
-<!-- ── Status modal ──────────────────────────────────── -->
-<div class="overlay" id="overlay">
+<!-- ネタ ステータスモーダル -->
+<div class="overlay" id="neta-overlay">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">ステータスを変更</div>
-    <button class="status-opt" data-s="ネタ">
-      <span class="status-dot" style="background:#8e8e93"></span>ネタ（未着手）
-    </button>
-    <button class="status-opt" data-s="作成中">
-      <span class="status-dot" style="background:#007AFF"></span>作成中
-    </button>
-    <button class="status-opt" data-s="完成">
-      <span class="status-dot" style="background:#FF9500"></span>完成（Voicy待ち）
-    </button>
-    <button class="status-opt" data-s="Voicy済み">
-      <span class="status-dot" style="background:#AF52DE"></span>Voicy済み
-    </button>
-    <button class="status-opt" data-s="公開済み">
-      <span class="status-dot" style="background:#34C759"></span>公開済み
-    </button>
+    <button class="status-opt" data-s="ネタ"><span class="status-dot" style="background:#8e8e93"></span>ネタ（未着手）</button>
+    <button class="status-opt" data-s="作成中"><span class="status-dot" style="background:#007AFF"></span>作成中</button>
+    <button class="status-opt" data-s="完成"><span class="status-dot" style="background:#FF9500"></span>完成</button>
+    <button class="status-opt" data-s="Voicy済み"><span class="status-dot" style="background:#AF52DE"></span>Voicy済み</button>
+    <button class="status-opt" data-s="公開済み"><span class="status-dot" style="background:#34C759"></span>公開済み</button>
   </div>
 </div>
 
-<!-- ── Toast ─────────────────────────────────────────── -->
+<!-- コンテンツ 詳細モーダル -->
+<div class="overlay" id="cont-overlay">
+  <div class="sheet detail-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="cont-modal-title">コンテンツ詳細</div>
+    <div class="detail-field">
+      <div class="detail-label">noteステータス</div>
+      <select class="detail-select" id="d-noteStatus">
+        <option>下書き</option><option>完成</option><option>公開済み</option>
+      </select>
+    </div>
+    <div class="detail-field">
+      <div class="detail-label">note URL</div>
+      <input type="text" class="detail-input" id="d-noteUrl" placeholder="https://note.com/...">
+    </div>
+    <div class="detail-field">
+      <div class="detail-label">note 公開日</div>
+      <input type="date" class="detail-input" id="d-noteDate">
+    </div>
+    <div class="detail-field">
+      <div class="detail-label">Voicy ステータス</div>
+      <select class="detail-select" id="d-voicyStatus">
+        <option>未収録</option><option>収録済み</option><option>公開済み</option>
+      </select>
+    </div>
+    <div class="detail-field">
+      <div class="detail-label">Voicy URL</div>
+      <input type="text" class="detail-input" id="d-voicyUrl" placeholder="https://voicy.jp/...">
+    </div>
+    <div class="detail-field">
+      <div class="detail-label">Voicy 公開日</div>
+      <input type="date" class="detail-input" id="d-voicyDate">
+    </div>
+    <div class="detail-field">
+      <div class="detail-label">有料 / 無料</div>
+      <select class="detail-select" id="d-paid">
+        <option>有料</option><option>無料</option>
+      </select>
+    </div>
+    <div class="detail-field">
+      <div class="detail-label">メモ</div>
+      <input type="text" class="detail-input" id="d-memo" placeholder="メモを追加…">
+    </div>
+    <button class="detail-save" id="detail-save-btn">保存する</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-/* ============================================================
-   Config
-============================================================ */
+/* ── Config ────────────────────────────── */
 const API = 'https://script.google.com/macros/s/AKfycbzoeQtnPFu_bjT9QDYqlsIdabUhMprIMRt7U9GvWEUUFgh89biQ73qZeXhUmASYj4ei6A/exec';
 
-/* ============================================================
-   Theme
-============================================================ */
+/* ── Theme ─────────────────────────────── */
 const moonSVG = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
 const sunSVG  = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-
-let dark = localStorage.theme === 'dark' || (!localStorage.theme && matchMedia('(prefers-color-scheme:dark)').matches);
-
-function applyTheme(d) {
+let dark = localStorage.theme==='dark' || (!localStorage.theme && matchMedia('(prefers-color-scheme:dark)').matches);
+const applyTheme = d => {
   dark = d;
   document.documentElement.dataset.theme = d ? 'dark' : 'light';
   document.getElementById('theme-icon').innerHTML = d ? sunSVG : moonSVG;
   localStorage.theme = d ? 'dark' : 'light';
-}
+};
 applyTheme(dark);
 document.getElementById('theme-btn').onclick = () => applyTheme(!dark);
 
-/* ============================================================
-   Tabs
-============================================================ */
-let allItems = [], listReady = false, activeFilter = 'すべて';
+/* ── Tabs ──────────────────────────────── */
+let allNeta = [], allCont = [], netaReady = false, contReady = false;
+let netaFilter = 'すべて', contFilter = 'すべて';
 
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn, .page').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn,.page').forEach(el => el.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('page-' + btn.dataset.tab).classList.add('active');
-    if (btn.dataset.tab === 'list') loadList();
+    if (btn.dataset.tab === 'list') loadNeta();
+    if (btn.dataset.tab === 'cont') loadCont();
   });
 });
 
-/* ============================================================
-   Pills
-============================================================ */
+/* ── Pills ─────────────────────────────── */
 let genre = '移住', priority = '中';
-
-function setupPills(id, cb) {
+const setupPills = (id, cb) => {
   document.getElementById(id).addEventListener('click', e => {
-    const p = e.target.closest('.pill');
-    if (!p) return;
+    const p = e.target.closest('.pill'); if (!p) return;
     document.querySelectorAll(`#${id} .pill`).forEach(x => x.classList.remove('selected'));
-    p.classList.add('selected');
-    cb(p.dataset.val);
+    p.classList.add('selected'); cb(p.dataset.val);
   });
-}
+};
 setupPills('genre-pills',    v => genre    = v);
 setupPills('priority-pills', v => priority = v);
 
-/* ============================================================
-   Filter chips
-============================================================ */
-document.getElementById('filter-bar').addEventListener('click', e => {
-  const c = e.target.closest('.filter-chip');
-  if (!c) return;
-  document.querySelectorAll('.filter-chip').forEach(x => x.classList.remove('active'));
-  c.classList.add('active');
-  activeFilter = c.dataset.f;
-  renderList();
-});
+/* Filter chips */
+const setupFilter = (barId, onChange) => {
+  document.getElementById(barId).addEventListener('click', e => {
+    const c = e.target.closest('.filter-chip'); if (!c) return;
+    document.querySelectorAll(`#${barId} .filter-chip`).forEach(x => x.classList.remove('active'));
+    c.classList.add('active'); onChange(c.dataset.f);
+  });
+};
+setupFilter('filter-bar',      f => { netaFilter = f; renderNeta(); });
+setupFilter('cont-filter-bar', f => { contFilter = f; renderCont(); });
 
-/* ============================================================
-   Voice input
-============================================================ */
+/* ── Voice input ───────────────────────── */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const micBtn = document.getElementById('mic-btn');
 let recog, isRec = false;
-
 if (SR) {
-  recog = new SR();
-  recog.lang = 'ja-JP';
-  recog.continuous = false;
-  recog.interimResults = true;
-  recog.onresult = e => {
-    document.getElementById('keyword').value =
-      Array.from(e.results).map(r => r[0].transcript).join('');
-  };
+  recog = new SR(); recog.lang = 'ja-JP'; recog.continuous = false; recog.interimResults = true;
+  recog.onresult = e => { document.getElementById('keyword').value = Array.from(e.results).map(r=>r[0].transcript).join(''); };
   recog.onend = () => { isRec = false; micBtn.classList.remove('recording'); };
   recog.onerror = () => { isRec = false; micBtn.classList.remove('recording'); toast('音声認識エラー'); };
 }
-
 micBtn.addEventListener('click', () => {
   if (!SR) { toast('このブラウザは音声入力に未対応です'); return; }
-  if (isRec) { recog.stop(); }
-  else { recog.start(); isRec = true; micBtn.classList.add('recording'); toast('🎙 話してください…'); }
+  if (isRec) { recog.stop(); } else { recog.start(); isRec = true; micBtn.classList.add('recording'); toast('🎙 話してください…'); }
 });
 
-/* ============================================================
-   Toast
-============================================================ */
+/* ── Toast ─────────────────────────────── */
 let toastTimer;
-function toast(msg) {
+const toast = msg => {
   const el = document.getElementById('toast');
   el.textContent = msg; el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
-}
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+};
 
-/* ============================================================
-   HTML escape
-============================================================ */
-function esc(s) {
-  return String(s ?? '').replace(/[&<>"']/g,
-    c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
+/* ── Escape ────────────────────────────── */
+const esc = s => String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-/* ============================================================
-   Recent (localStorage)
-============================================================ */
-const RKEY = 'neta_v3';
-const getRecent = () => { try { return JSON.parse(localStorage.getItem(RKEY) || '[]'); } catch { return []; } };
-
-function pushRecent(item) {
-  localStorage.setItem(RKEY, JSON.stringify([item, ...getRecent()].slice(0, 5)));
-  renderRecent();
-}
-
-function renderRecent() {
-  const el = document.getElementById('recent-list');
-  const items = getRecent();
-  if (!items.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-icon">💡</div><div class="empty-text">思いついたネタをすぐ保存しよう</div></div>';
-    return;
-  }
-  el.innerHTML = items.map(i => `
-    <div class="neta-item">
-      <div class="neta-top">
-        <span class="neta-keyword">${esc(i.keyword)}</span>
-        <div class="badges"><span class="badge">${esc(i.genre)}</span></div>
-      </div>
-    </div>`).join('');
-}
-
-/* ============================================================
-   List (JSONP from Apps Script)
-============================================================ */
-function loadList(force) {
-  if (listReady && !force) { renderList(); return; }
-  document.getElementById('list-wrap').innerHTML = '<div class="spinner"></div>';
-
-  const cb = 'cb_' + Date.now();
-  const timeout = setTimeout(() => {
-    delete window[cb]; document.getElementById('_jsonp_s')?.remove();
-    document.getElementById('list-wrap').innerHTML =
-      '<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">読み込めませんでした。<br>再度タブを開いてください。</div></div>';
-  }, 10000);
-
-  window[cb] = data => {
-    clearTimeout(timeout);
-    allItems = Array.isArray(data) ? data : [];
-    listReady = true;
-    renderList();
-    delete window[cb];
-    document.getElementById('_jsonp_s')?.remove();
-  };
-
+/* ── JSONP loader ──────────────────────── */
+function jsonpLoad(action, cb) {
+  const cbName = 'cb_' + Date.now();
+  const timer = setTimeout(() => { delete window[cbName]; document.getElementById('_jsc')?.remove(); }, 12000);
+  window[cbName] = data => { clearTimeout(timer); delete window[cbName]; document.getElementById('_jsc')?.remove(); cb(Array.isArray(data) ? data : []); };
   const s = document.createElement('script');
-  s.id  = '_jsonp_s';
-  s.src = `${API}?action=list&callback=${cb}`;
-  s.onerror = () => { clearTimeout(timeout); toast('読み込みエラー'); };
+  s.id = '_jsc';
+  s.src = `${API}?action=${action}&callback=${cbName}`;
+  s.onerror = () => { clearTimeout(timer); cb([]); };
   document.head.appendChild(s);
 }
 
-function renderList() {
-  const el = document.getElementById('list-wrap');
-  const items = activeFilter === 'すべて'
-    ? allItems
-    : allItems.filter(i => i['ステータス'] === activeFilter);
+/* ── POST helper (no-cors) ─────────────── */
+const post = params => fetch(API, { method:'POST', mode:'no-cors', body: new URLSearchParams(params) });
 
-  if (!items.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-icon">🗂</div><div class="empty-text">該当するネタがありません</div></div>';
-    return;
-  }
+/* ── Recent (localStorage) ─────────────── */
+const RKEY = 'neta_v3';
+const getRecent = () => { try { return JSON.parse(localStorage.getItem(RKEY)||'[]'); } catch { return []; } };
+const pushRecent = item => { localStorage.setItem(RKEY, JSON.stringify([item,...getRecent()].slice(0,5))); renderRecent(); };
+
+const renderRecent = () => {
+  const el = document.getElementById('recent-list');
+  const items = getRecent();
+  if (!items.length) { el.innerHTML='<div class="empty"><div class="empty-icon">💡</div><div class="empty-text">思いついたネタをすぐ保存しよう</div></div>'; return; }
+  el.innerHTML = items.map(i=>`<div class="neta-item"><div class="neta-top"><span class="neta-kw">${esc(i.keyword)}</span><div class="badges"><span class="badge">${esc(i.genre)}</span></div></div></div>`).join('');
+};
+
+/* ── Neta list ─────────────────────────── */
+function loadNeta(force) {
+  if (netaReady && !force) { renderNeta(); return; }
+  document.getElementById('list-wrap').innerHTML = '<div class="spinner"></div>';
+  jsonpLoad('list', data => { allNeta = data; netaReady = true; renderNeta(); });
+}
+
+function renderNeta() {
+  const el = document.getElementById('list-wrap');
+  const items = netaFilter === 'すべて' ? allNeta : allNeta.filter(i => i['ステータス'] === netaFilter);
+  if (!items.length) { el.innerHTML='<div class="empty"><div class="empty-icon">🗂</div><div class="empty-text">該当するネタがありません</div></div>'; return; }
   el.innerHTML = items.map(item => {
-    const kw   = item['キーワード'] || '';
-    const gn   = item['ジャンル']   || '';
-    const st   = item['ステータス'] || 'ネタ';
-    const dt   = item['日時']       || '';
-    const memo = item['メモ']       || '';
-    const tsE  = esc(dt);
-    return `
-      <div class="neta-item">
-        <div class="neta-top">
-          <span class="neta-keyword">${esc(kw)}</span>
-          <div class="badges">
-            <span class="badge">${esc(gn)}</span>
-            <span class="badge s-${esc(st)}">${esc(st)}</span>
-          </div>
+    const kw = item['キーワード']||'', gn = item['ジャンル']||'', st = item['ステータス']||'ネタ';
+    const dt = item['日時']||'', memo = item['メモ']||'';
+    const tsE = esc(dt);
+    return `<div class="neta-item">
+      <div class="neta-top">
+        <span class="neta-kw">${esc(kw)}</span>
+        <div class="badges"><span class="badge">${esc(gn)}</span><span class="badge s-${esc(st)}">${esc(st)}</span></div>
+      </div>
+      ${memo?`<div class="neta-memo">${esc(memo)}</div>`:''}
+      <div class="neta-bottom">
+        <span class="neta-meta">${tsE}</span>
+        <div class="neta-actions">
+          <button class="act-btn" onclick="openNetaModal('${tsE}','${esc(st)}')">ステータス</button>
+          <button class="act-btn primary" onclick="doCreateContent('${esc(kw)}','${esc(gn)}','${esc(memo)}',this)">コンテンツ化</button>
         </div>
-        ${memo ? `<div class="neta-memo">${esc(memo)}</div>` : ''}
-        <div class="neta-bottom">
-          <span class="neta-meta">${tsE}</span>
-          <div class="neta-actions">
-            <button class="act-btn" onclick="openModal('${tsE}','${esc(st)}')">ステータス</button>
-            <button class="act-btn" onclick="copyPrompt('${esc(kw)}','${esc(gn)}','${esc(memo)}')">記事化</button>
-          </div>
-        </div>
-      </div>`;
+      </div>
+    </div>`;
   }).join('');
 }
 
-/* ============================================================
-   Status modal
-============================================================ */
-let modalTs = null;
-const overlay = document.getElementById('overlay');
-
-function openModal(ts, currentSt) {
-  modalTs = decodeURIComponent(ts);
-  overlay.classList.add('open');
-  document.querySelectorAll('.status-opt').forEach(b => {
-    b.style.fontWeight = b.dataset.s === currentSt ? '700' : '400';
-  });
+/* ── Content list ──────────────────────── */
+function loadCont(force) {
+  if (contReady && !force) { renderCont(); return; }
+  document.getElementById('cont-wrap').innerHTML = '<div class="spinner"></div>';
+  jsonpLoad('contents', data => { allCont = data; contReady = true; renderCont(); });
 }
 
-overlay.addEventListener('click', e => {
-  if (e.target === overlay) { overlay.classList.remove('open'); return; }
-  const btn = e.target.closest('.status-opt');
-  if (!btn) return;
-  overlay.classList.remove('open');
-  const newSt = btn.dataset.s;
+function renderCont() {
+  const el = document.getElementById('cont-wrap');
+  const items = contFilter === 'すべて' ? allCont : allCont.filter(i => i['noteステータス'] === contFilter);
+  if (!items.length) { el.innerHTML='<div class="empty"><div class="empty-icon">📁</div><div class="empty-text">コンテンツがありません<br>ネタ一覧から「コンテンツ化」してください</div></div>'; return; }
+  el.innerHTML = items.map(item => {
+    const title   = item['タイトル']||'';
+    const genre   = item['ジャンル']||'';
+    const docUrl  = item['ドキュメントURL']||'';
+    const noteSt  = item['noteステータス']||'下書き';
+    const voicySt = item['Voicyステータス']||'未収録';
+    const noteUrl = item['note URL']||'';
+    const voicyUrl= item['Voicy URL']||'';
+    const paid    = item['有料/無料']||'有料';
+    const dt      = item['作成日']||'';
+    const tsE     = esc(dt);
+    return `<div class="cont-item" onclick="openContModal('${tsE}')">
+      <div class="cont-title">${esc(title)}</div>
+      <div class="cont-row">
+        <div class="badges">
+          <span class="badge">${esc(genre)}</span>
+          <span class="badge s-${esc(noteSt)}">note:${esc(noteSt)}</span>
+          <span class="badge s-${esc(voicySt)}">Voicy:${esc(voicySt)}</span>
+          <span class="badge s-${esc(paid)}">${esc(paid)}</span>
+        </div>
+      </div>
+      <div class="cont-links">
+        ${docUrl  ? `<a href="${esc(docUrl)}"  target="_blank" class="link-btn filled" onclick="event.stopPropagation()">📄 Doc</a>` : ''}
+        ${noteUrl ? `<a href="${esc(noteUrl)}" target="_blank" class="link-btn filled" onclick="event.stopPropagation()">📝 note</a>` : ''}
+        ${voicyUrl? `<a href="${esc(voicyUrl)}"target="_blank" class="link-btn filled" onclick="event.stopPropagation()">🎙️ Voicy</a>` : ''}
+        <button class="link-btn" onclick="event.stopPropagation();copyPrompt('${esc(title)}','${esc(genre)}','')">✍️ Claude記事化</button>
+      </div>
+      <div style="font-size:12px;color:var(--text2);margin-top:8px;">${tsE}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Neta status modal ─────────────────── */
+let netaModalTs = null;
+const netaOverlay = document.getElementById('neta-overlay');
+function openNetaModal(ts, st) {
+  netaModalTs = decodeURIComponent(ts); netaOverlay.classList.add('open');
+  netaOverlay.querySelectorAll('.status-opt').forEach(b => b.style.fontWeight = b.dataset.s===st?'700':'400');
+}
+netaOverlay.addEventListener('click', e => {
+  if (e.target === netaOverlay) { netaOverlay.classList.remove('open'); return; }
+  const btn = e.target.closest('.status-opt'); if (!btn) return;
+  netaOverlay.classList.remove('open');
+  const st = btn.dataset.s;
+  const idx = allNeta.findIndex(i=>i['日時']===netaModalTs);
+  if (idx !== -1) { allNeta[idx]['ステータス'] = st; renderNeta(); }
+  toast(`✅ ${st} に変更`);
+  post({ action:'updateStatus', timestamp:netaModalTs, status:st });
+});
+
+/* ── Content detail modal ──────────────── */
+let contModalTs = null;
+const contOverlay = document.getElementById('cont-overlay');
+function openContModal(ts) {
+  contModalTs = decodeURIComponent(ts);
+  const item = allCont.find(i => i['作成日'] === contModalTs);
+  if (!item) return;
+  document.getElementById('cont-modal-title').textContent = item['タイトル'] || 'コンテンツ詳細';
+  document.getElementById('d-noteStatus').value  = item['noteステータス']  || '下書き';
+  document.getElementById('d-noteUrl').value     = item['note URL']        || '';
+  document.getElementById('d-noteDate').value    = (item['note公開日']||'').replace(/\//g,'-');
+  document.getElementById('d-voicyStatus').value = item['Voicyステータス'] || '未収録';
+  document.getElementById('d-voicyUrl').value    = item['Voicy URL']       || '';
+  document.getElementById('d-voicyDate').value   = (item['Voicy公開日']||'').replace(/\//g,'-');
+  document.getElementById('d-paid').value        = item['有料/無料']        || '有料';
+  document.getElementById('d-memo').value        = item['メモ']             || '';
+  contOverlay.classList.add('open');
+}
+contOverlay.addEventListener('click', e => { if (e.target === contOverlay) contOverlay.classList.remove('open'); });
+
+document.getElementById('detail-save-btn').addEventListener('click', () => {
+  if (!contModalTs) return;
+  const updates = {
+    noteStatus:  document.getElementById('d-noteStatus').value,
+    noteUrl:     document.getElementById('d-noteUrl').value,
+    noteDate:    document.getElementById('d-noteDate').value,
+    voicyStatus: document.getElementById('d-voicyStatus').value,
+    voicyUrl:    document.getElementById('d-voicyUrl').value,
+    voicyDate:   document.getElementById('d-voicyDate').value,
+    paid:        document.getElementById('d-paid').value,
+    memo:        document.getElementById('d-memo').value,
+  };
   // Optimistic update
-  const idx = allItems.findIndex(i => i['日時'] === modalTs);
-  if (idx !== -1) { allItems[idx]['ステータス'] = newSt; renderList(); }
-  toast(`✅ ${newSt} に変更しました`);
-  // Persist
-  fetch(API, {
-    method: 'POST', mode: 'no-cors',
-    body: new URLSearchParams({ action: 'updateStatus', timestamp: modalTs, status: newSt })
+  const idx = allCont.findIndex(i => i['作成日'] === contModalTs);
+  if (idx !== -1) {
+    allCont[idx]['noteステータス']  = updates.noteStatus;
+    allCont[idx]['note URL']        = updates.noteUrl;
+    allCont[idx]['note公開日']      = updates.noteDate;
+    allCont[idx]['Voicyステータス'] = updates.voicyStatus;
+    allCont[idx]['Voicy URL']       = updates.voicyUrl;
+    allCont[idx]['Voicy公開日']     = updates.voicyDate;
+    allCont[idx]['有料/無料']        = updates.paid;
+    allCont[idx]['メモ']             = updates.memo;
+    renderCont();
+  }
+  contOverlay.classList.remove('open');
+  toast('✅ 保存しました');
+  // Persist each field
+  Object.entries(updates).forEach(([field, value]) => {
+    post({ action:'updateContent', timestamp:contModalTs, field, value });
   });
 });
 
-/* ============================================================
-   Claude 記事化プロンプトをコピー
-============================================================ */
-function copyPrompt(kw, gn, memo) {
-  const prompt =
-`以下のテーマで宮古島移住・起業の体験談をnote有料記事として書いてください。
-
-【テーマ】${kw}
-【ジャンル】${gn}${memo ? '\n【補足】' + memo : ''}
-
-■ 構成
-1. 冒頭（読者が共感できる失敗・問題提起）
-2. 具体的な体験談（数字・期間・費用を含む）
-3. 解決策・学んだこと
-4. 読者へのアドバイス
-
-■ 文体：話し言葉に近い、親しみやすい口調`;
-
-  navigator.clipboard.writeText(prompt)
-    .then(() => toast('📋 Claudeプロンプトをコピーしました'))
-    .catch(()  => toast('コピーできませんでした'));
+/* ── コンテンツ化 ──────────────────────── */
+async function doCreateContent(kw, gn, memo, btn) {
+  if (!confirm(`「${kw}」をコンテンツ化しますか？\nGoogle Docが自動作成されます。`)) return;
+  btn.disabled = true; btn.textContent = '作成中…';
+  try {
+    await post({ action:'createContent', keyword:kw, genre:gn, memo });
+    toast('📄 Google Docを作成しました！コンテンツタブを確認してください');
+    contReady = false; // 次回コンテンツタブ表示時にリロード
+  } catch { toast('❌ エラーが発生しました'); }
+  finally { btn.disabled = false; btn.textContent = 'コンテンツ化'; }
 }
 
-/* ============================================================
-   Save
-============================================================ */
+/* ── Claude記事化プロンプト ─────────────── */
+function copyPrompt(kw, gn, memo) {
+  const p = `以下のテーマで宮古島移住・起業の体験談をnote有料記事として書いてください。\n\n【テーマ】${kw}\n【ジャンル】${gn}${memo?'\n【補足】'+memo:''}\n\n■ 構成\n1. 冒頭（読者が共感できる失敗・問題提起）\n2. 具体的な体験談（数字・期間・費用を含む）\n3. 解決策・学んだこと\n4. 読者へのアドバイス\n\n■ 文体：話し言葉に近い、親しみやすい口調で。`;
+  navigator.clipboard.writeText(p).then(()=>toast('📋 Claudeプロンプトをコピーしました')).catch(()=>toast('コピーできませんでした'));
+}
+
+/* ── Save neta ─────────────────────────── */
 document.getElementById('neta-form').addEventListener('submit', async e => {
   e.preventDefault();
   const kw = document.getElementById('keyword').value.trim();
   if (!kw) { toast('キーワードを入力してください'); return; }
-
   const btn = document.getElementById('save-btn');
   btn.disabled = true; btn.textContent = '保存中…';
-
   try {
-    await fetch(API, {
-      method: 'POST', mode: 'no-cors',
-      body: new URLSearchParams({ action: 'add', keyword: kw, genre, priority, memo: document.getElementById('memo').value.trim() })
-    });
-    pushRecent({ keyword: kw, genre });
-    listReady = false;
+    await post({ action:'add', keyword:kw, genre, priority, memo:document.getElementById('memo').value.trim() });
+    pushRecent({ keyword:kw, genre }); netaReady = false;
     toast('✅ 保存しました！');
     if (navigator.vibrate) navigator.vibrate(10);
     document.getElementById('keyword').value = '';
     document.getElementById('memo').value    = '';
-  } catch {
-    toast('❌ エラーが発生しました');
-  } finally {
-    btn.disabled = false; btn.textContent = '保存する';
-  }
+  } catch { toast('❌ エラーが発生しました'); }
+  finally { btn.disabled=false; btn.textContent='保存する'; }
 });
 
-/* ============================================================
-   Init
-============================================================ */
+/* ── Init ──────────────────────────────── */
 renderRecent();
 document.getElementById('keyword').focus();
 </script>
