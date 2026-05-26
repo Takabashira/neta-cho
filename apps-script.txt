@@ -53,9 +53,9 @@ function doPost(e) {
         '下書き',    // E: noteステータス
         '',          // F: note URL
         '',          // G: note公開日
-        '未収録',    // H: Voicyステータス
-        '',          // I: Voicy URL
-        '',          // J: Voicy公開日
+        '未収録',    // H: 配信ステータス
+        '',          // I: 配信URL
+        '',          // J: 配信公開日
         '有料',      // K: 有料/無料
         memo         // L: メモ
       ]);
@@ -157,8 +157,8 @@ function createGoogleDoc(keyword, genre, memo) {
 
   body.appendHorizontalRule();
 
-  // ── Voicy台本 ──
-  body.appendParagraph('🎙️ Voicy 台本').setHeading(h1);
+  // ── stand.fm台本 ──
+  body.appendParagraph('🎙️ stand.fm 台本').setHeading(h1);
 
   body.appendParagraph('【入り口トーク（〜2分）】').setHeading(h2);
   body.appendParagraph('※ 記事より軽いトーンで話す。リスナーが「もっと知りたい」と思う入り口だけ話す。\n例：「今日はXXXについて話すんですが、実はめちゃくちゃ詰まったことがあって…」');
@@ -229,7 +229,7 @@ function getOrCreateContentSheet(ss) {
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_CONTENT);
     setupSheet(sheet,
-      ['作成日','タイトル','ジャンル','ドキュメントURL','noteステータス','note URL','note公開日','Voicyステータス','Voicy URL','Voicy公開日','有料/無料','メモ'],
+      ['作成日','タイトル','ジャンル','ドキュメントURL','noteステータス','note URL','note公開日','配信ステータス','配信URL','配信公開日','有料/無料','メモ'],
       [130, 240, 80, 260, 90, 220, 90, 90, 220, 90, 70, 200]);
   }
   return sheet;
@@ -319,7 +319,7 @@ function setupManual() {
   // ── キャラクター設定 ──
   section('🎭 キャラクター設定');
   row('発信者名', '岡村 ｜ 宮古島しくじり社長', false);
-  row('Voicyチャンネル名', '宮古島しくじり経営ラジオ', true);
+  row('stand.fmチャンネル名', '宮古島しくじり経営ラジオ', true);
   row('一次ターゲット', '宮古島でこれから挑戦したいと思っている方', false);
   row('二次ターゲット', '宮古島に興味がある方', true);
   row('発信テーマ', '民泊・不動産・移住・経営・島暮らしのしくじり実録', false);
@@ -331,8 +331,8 @@ function setupManual() {
 
   // ── アカウント一覧 ──
   section('📱 アカウント一覧と役割');
-  row('Voicy（新規作成）', '【集客エンジン①】無料音声配信。入り口トークでnoteへ誘導。チャンネル名：宮古島しくじり経営ラジオ', false);
-  row('X / Twitter（新規作成）', '【集客エンジン②】Voicy配信シェア・日常発信。Voicyと連動', true);
+  row('stand.fm（新規作成）', '【集客エンジン①】無料音声配信。入り口トークでnoteへ誘導。チャンネル名：宮古島しくじり経営ラジオ', false);
+  row('X / Twitter（新規作成）', '【集客エンジン②】stand.fm配信シェア・日常発信。stand.fmと連動', true);
   row('note（新規作成）', '【収益の核】有料マガジン・コミュニティの拠点。アカウント名：岡村｜宮古島しくじり社長', false);
   row('note（個人 miyakonori）', '【別運用】映画・漫画・日常。ビジネス発信と絶対に混ぜない', true);
   row('Instagram（既存）', '【別事業用】AQXIA・AIR・283の施設アカウント。このビジネスとは分離', false);
@@ -343,22 +343,22 @@ function setupManual() {
   row('Step 1｜随時（30秒）', 'アイデアを思いついたら → ネタ帳アプリで即保存', false);
   row('Step 2｜週1回', 'ネタ一覧を見て、今週記事にするネタを1つ選ぶ', true);
   row('Step 3｜週1回', '「コンテンツ化」ボタンを押す → Google Docが自動生成される', false);
-  row('Step 4｜週1回（30分）', 'DocをClaude AIと一緒に仕上げる（note本文 ＋ Voicy台本）', true);
-  row('Step 5｜週1回（20分）', 'Voicyで入り口トークを収録・投稿', false);
+  row('Step 4｜週1回（30分）', 'DocをClaude AIと一緒に仕上げる（note本文 ＋ stand.fm台本）', true);
+  row('Step 5｜週1回（20分）', 'stand.fmで入り口トークを収録・投稿', false);
   row('Step 6｜週1回', 'noteに有料記事として公開 → URLをコンテンツ管理シートに記録', true);
   blank();
 
   // ── 毎日のルーティン ──
   section('📅 毎日のルーティン');
   row('毎日（5分）', 'ネタ帳アプリでアイデアを保存。思いついたらすぐ開く', false);
-  row('週1回（20分）', 'Voicy収録・投稿（記事の入り口トーク）', true);
+  row('週1回（20分）', 'stand.fm収録・投稿（記事の入り口トーク）', true);
   row('週1回（30分）', 'Claudeと記事作成 → noteに投稿 → URLを記録', false);
   row('月1回（10分）', 'コンテンツ管理シートで進捗確認・翌月の計画', true);
   blank();
 
   // ── 成長フェーズ ──
   section('📈 成長フェーズ');
-  row('フェーズ1（1〜3ヶ月）', 'Voicy毎日配信・note無料記事10本・フォロワー獲得期', false);
+  row('フェーズ1（1〜3ヶ月）', 'stand.fm毎日配信・note無料記事10本・フォロワー獲得期', false);
   row('フェーズ2（4〜6ヶ月）', 'note有料マガジン開始（月500円）・読者50〜100人目標', true);
   row('フェーズ3（7〜12ヶ月）', 'コミュニティ開始（月3,000円）・80人達成で月30万円達成', false);
   blank();
@@ -371,7 +371,7 @@ function setupManual() {
   row('ジャンル', '移住 / 不動産 / 民泊 / 経営 / 島暮らし / その他', false);
   row('優先度', '高・中・低。次に記事化するネタを選ぶ目安', true);
   row('メモ', '思いついた補足・エピソード・費用・期間など', false);
-  row('ステータス', 'ネタ → 作成中 → 完成 → Voicy済み → 公開済み　（アプリから変更可）', true);
+  row('ステータス', 'ネタ → 作成中 → 完成 → 配信済み → 公開済み　（アプリから変更可）', true);
   blank();
 
   // ── コンテンツ管理シートの使い方 ──
@@ -384,9 +384,9 @@ function setupManual() {
   row('noteステータス', '下書き → 完成 → 公開済み　（アプリから変更可）', false);
   row('note URL', 'noteに公開したあとURLを貼る', true);
   row('note公開日', '公開した日付を記録', false);
-  row('Voicyステータス', '未収録 → 収録済み → 公開済み　（アプリから変更可）', true);
-  row('Voicy URL', 'Voicyに投稿したあとURLを貼る', false);
-  row('Voicy公開日', '収録・公開した日付を記録', true);
+  row('配信ステータス', '未収録 → 収録済み → 公開済み　（アプリから変更可）', true);
+  row('配信URL', 'stand.fmに投稿したあとURLを貼る', false);
+  row('配信公開日', '収録・公開した日付を記録', true);
   row('有料/無料', 'note記事が有料か無料か', false);
   row('メモ', '補足・読者の反応・気づきなど', true);
   blank();
@@ -409,21 +409,21 @@ function setupManual() {
 // =====================================================
 function setupPostSheets() {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  _createVoicySheet(ss);
+  _createStandFmSheet(ss);
   _createNoteSheet(ss);
   _createXSheet(ss);
   _createDashboard(ss);
-  SpreadsheetApp.getUi().alert('✅ シートを4枚作成しました！\n📊 ダッシュボード / 📻 Voicy管理 / 📝 note管理 / 🐦 X投稿管理');
+  SpreadsheetApp.getUi().alert('✅ シートを4枚作成しました！\n📊 ダッシュボード / 📻 音声配信管理 / 📝 note管理 / 🐦 X投稿管理');
 }
 
-// ── 📻 Voicy管理シート ────────────────────────────────
-function _createVoicySheet(ss) {
-  const name = '📻 Voicy管理';
+// ── 📻 音声配信管理シート ────────────────────────────────
+function _createStandFmSheet(ss) {
+  const name = '📻 音声配信管理';
   const old = ss.getSheetByName(name); if (old) ss.deleteSheet(old);
   const sheet = ss.insertSheet(name);
 
   // 列: 収録予定日 | タイトル | 内容メモ | 関連note | ステータス | 公開日 | URL | 再生数 | 再生数更新日 | メモ
-  const headers = ['収録予定日','エピソードタイトル','話す内容メモ（箇条書きでOK）','関連note記事タイトル','ステータス','公開日','Voicy URL','再生数','再生数更新日','メモ'];
+  const headers = ['収録予定日','エピソードタイトル','話す内容メモ（箇条書きでOK）','関連note記事タイトル','ステータス','公開日','配信URL','再生数','再生数更新日','メモ'];
   const widths  = [110, 240, 300, 200, 90, 100, 200, 70, 110, 160];
   _headerRow(sheet, headers, widths, '#1DB954', '#ffffff');
 
@@ -453,8 +453,8 @@ function _createNoteSheet(ss) {
   const old = ss.getSheetByName(name); if (old) ss.deleteSheet(old);
   const sheet = ss.insertSheet(name);
 
-  // 列: 公開予定日 | タイトル | ジャンル | 有料/無料 | ステータス | 公開日 | URL | 累計PV | PV更新日 | 売上（円）| 売上更新日 | 連携VoicyURL | メモ
-  const headers = ['公開予定日','タイトル','ジャンル','有料/無料','ステータス','公開日','note URL','累計PV','PV更新日','売上（円）','売上更新日','連携VoicyURL','メモ'];
+  // 列: 公開予定日 | タイトル | ジャンル | 有料/無料 | ステータス | 公開日 | URL | 累計PV | PV更新日 | 売上（円）| 売上更新日 | 連携配信URL | メモ
+  const headers = ['公開予定日','タイトル','ジャンル','有料/無料','ステータス','公開日','note URL','累計PV','PV更新日','売上（円）','売上更新日','連携配信URL','メモ'];
   const widths  = [110, 260, 80, 70, 90, 100, 200, 70, 100, 80, 100, 200, 160];
   _headerRow(sheet, headers, widths, '#41C9B4', '#ffffff');
 
@@ -502,7 +502,7 @@ function _createXSheet(ss) {
   sheet.setRowHeight(1, 32);
 
   const templates = [
-    ['Voicy告知',  '【新エピソード🎙️】\n「〇〇」の話をしました。\n\n宮古島で実際に経験した〇〇のリアルです。\n\n▼ 聴く → [VoicyのURL]\n詳細はnote記事にも👇 [noteのURL]\n\n#宮古島 #移住 #しくじり #起業'],
+    ['stand.fm告知',  '【新エピソード🎙️】\n「〇〇」の話をしました。\n\n宮古島で実際に経験した〇〇のリアルです。\n\n▼ 聴く → [stand.fmのURL]\n詳細はnote記事にも👇 [noteのURL]\n\n#宮古島 #移住 #しくじり #起業'],
     ['note告知',   '【有料記事を公開しました📝】\n\n「〇〇」\n\nこれから宮古島で〇〇を考えている方に\nぜひ読んでほしい内容です。\n\n▼ 読む → [noteのURL]\n\n#宮古島 #移住 #民泊 #不動産'],
     ['しくじり投稿','宮古島で〇〇をしようとしたら\n〇〇になった話。\n\n（詳細はVoicy/noteで👇）\n\n#宮古島 #しくじり #移住 #起業'],
     ['島暮らし投稿','宮古島の〇月。\n\n今日は〇〇でした。\n\n本土と全然違うなと思うのは〇〇。\n\n#宮古島 #島暮らし #移住'],
@@ -532,7 +532,7 @@ function _createXSheet(ss) {
 
   sheet.getRange(logRow+1, 2, 100, 1).setDataValidation(
     SpreadsheetApp.newDataValidation()
-      .requireValueInList(['Voicy告知','note告知','しくじり投稿','島暮らし','共感投稿','その他'], true).build()
+      .requireValueInList(['stand.fm告知','note告知','しくじり投稿','島暮らし','共感投稿','その他'], true).build()
   );
   sheet.getRange(logRow+1, 1, 100, 1).setNumberFormat('yyyy/MM/dd');
   sheet.getRange(logRow+1, 4, 100, 2).setNumberFormat('#,##0');
@@ -640,10 +640,10 @@ function _createDashboard(ss) {
   blank();
 
   // ── 📻 Voicy ──
-  sectionTitle('📻 Voicy', LGREEN, GREEN);
-  kpiRow('公開済みエピソード',  "=COUNTIF('📻 Voicy管理'!E:E,\"公開済み\")", 'エピソード', '', LGREEN);
-  kpiRow('台本作成済み（未収録）', "=COUNTIF('📻 Voicy管理'!E:E,\"台本あり\")", 'エピソード', '', LGREEN);
-  kpiRow('総再生数',            "=IFERROR(SUM('📻 Voicy管理'!H:H),0)", '回', '', '');
+  sectionTitle('📻 stand.fm', LGREEN, GREEN);
+  kpiRow('公開済みエピソード',  "=COUNTIF('📻 音声配信管理'!E:E,\"公開済み\")", 'エピソード', '', LGREEN);
+  kpiRow('台本作成済み（未収録）', "=COUNTIF('📻 音声配信管理'!E:E,\"台本あり\")", 'エピソード', '', LGREEN);
+  kpiRow('総再生数',            "=IFERROR(SUM('📻 音声配信管理'!H:H),0)", '回', '', '');
   blank();
 
   // ── 📝 note ──
