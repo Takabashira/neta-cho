@@ -448,7 +448,8 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 });
 
 /* ── Pills ─────────────────────────────── */
-let genre = 'コインランドリー', priority = '中';
+let genre = ['コインランドリー'], priority = '中';
+// 単一選択
 const setupPills = (id, cb) => {
   document.getElementById(id).addEventListener('click', e => {
     const p = e.target.closest('.pill'); if (!p) return;
@@ -456,10 +457,18 @@ const setupPills = (id, cb) => {
     p.classList.add('selected'); cb(p.dataset.val);
   });
 };
-setupPills('genre-pills',    v => genre    = v);
-setupPills('priority-pills', v => priority = v);
-setupPills('e-genre-pills',    v => editGenre    = v);
-setupPills('e-priority-pills', v => editPriority = v);
+// 複数選択
+const setupMultiPills = (id, cb) => {
+  document.getElementById(id).addEventListener('click', e => {
+    const p = e.target.closest('.pill'); if (!p) return;
+    p.classList.toggle('selected');
+    cb([...document.querySelectorAll(`#${id} .pill.selected`)].map(x => x.dataset.val));
+  });
+};
+setupMultiPills('genre-pills',   v => genre       = v);
+setupPills('priority-pills',     v => priority    = v);
+setupMultiPills('e-genre-pills', v => editGenre   = v);
+setupPills('e-priority-pills',   v => editPriority = v);
 
 /* Filter chips */
 const setupFilter = (barId, onChange) => {
@@ -522,7 +531,10 @@ const renderRecent = () => {
   const el = document.getElementById('recent-list');
   const items = getRecent();
   if (!items.length) { el.innerHTML='<div class="empty"><div class="empty-icon">💡</div><div class="empty-text">思いついたネタをすぐ保存しよう</div></div>'; return; }
-  el.innerHTML = items.map(i=>`<div class="neta-item"><div class="neta-top"><span class="neta-kw">${esc(i.keyword)}</span><div class="badges"><span class="badge">${esc(i.genre)}</span></div></div></div>`).join('');
+  el.innerHTML = items.map(i => {
+    const gnBadges = (i.genre||'').split('、').filter(Boolean).map(g=>`<span class="badge">${esc(g)}</span>`).join('');
+    return `<div class="neta-item"><div class="neta-top"><span class="neta-kw">${esc(i.keyword)}</span><div class="badges">${gnBadges}</div></div></div>`;
+  }).join('');
 };
 
 /* ── Neta list ─────────────────────────── */
@@ -540,10 +552,11 @@ function renderNeta() {
     const kw = item['キーワード']||'', gn = item['ジャンル']||'', st = item['ステータス']||'ネタ';
     const dt = item['日時']||'', memo = item['メモ']||'';
     const tsE = esc(dt);
+    const gnBadges = gn.split('、').filter(Boolean).map(g=>`<span class="badge">${esc(g)}</span>`).join('');
     return `<div class="neta-item">
       <div class="neta-top">
         <span class="neta-kw">${esc(kw)}</span>
-        <div class="badges"><span class="badge">${esc(gn)}</span><span class="badge s-${esc(st)}">${esc(st)}</span></div>
+        <div class="badges">${gnBadges}<span class="badge s-${esc(st)}">${esc(st)}</span></div>
       </div>
       ${memo?`<div class="neta-memo">${esc(memo)}</div>`:''}
       <div class="neta-bottom">
@@ -620,7 +633,7 @@ netaOverlay.addEventListener('click', e => {
 });
 
 /* ── Neta edit modal ───────────────────── */
-let editModalTs = null, editGenre = 'コインランドリー', editPriority = '中';
+let editModalTs = null, editGenre = ['コインランドリー'], editPriority = '中';
 const editOverlay = document.getElementById('edit-overlay');
 
 function openEditModal(ts) {
@@ -628,10 +641,10 @@ function openEditModal(ts) {
   const item = allNeta.find(i => i['日時'] === editModalTs);
   if (!item) return;
   document.getElementById('e-keyword').value = item['キーワード'] || '';
-  editGenre    = item['ジャンル'] || 'コインランドリー';
-  editPriority = item['優先度']   || '中';
+  editGenre    = (item['ジャンル'] || 'コインランドリー').split('、').filter(Boolean);
+  editPriority = item['優先度'] || '中';
   document.querySelectorAll('#e-genre-pills .pill').forEach(p =>
-    p.classList.toggle('selected', p.dataset.val === editGenre));
+    p.classList.toggle('selected', editGenre.includes(p.dataset.val)));
   document.querySelectorAll('#e-priority-pills .pill').forEach(p =>
     p.classList.toggle('selected', p.dataset.val === editPriority));
   document.getElementById('e-memo').value = item['メモ'] || '';
@@ -647,10 +660,11 @@ document.getElementById('edit-save-btn').addEventListener('click', () => {
   const kw   = document.getElementById('e-keyword').value.trim();
   const memo = document.getElementById('e-memo').value.trim();
   if (!kw) { toast('キーワードを入力してください'); return; }
+  const gnStr = editGenre.join('、') || 'その他';
   const idx = allNeta.findIndex(i => i['日時'] === editModalTs);
   if (idx !== -1) {
     allNeta[idx]['キーワード'] = kw;
-    allNeta[idx]['ジャンル']   = editGenre;
+    allNeta[idx]['ジャンル']   = gnStr;
     allNeta[idx]['優先度']     = editPriority;
     allNeta[idx]['メモ']       = memo;
     renderNeta();
@@ -658,7 +672,7 @@ document.getElementById('edit-save-btn').addEventListener('click', () => {
   }
   editOverlay.classList.remove('open');
   toast('✅ 更新しました');
-  post({ action:'updateNeta', timestamp:editModalTs, keyword:kw, genre:editGenre, priority:editPriority, memo });
+  post({ action:'updateNeta', timestamp:editModalTs, keyword:kw, genre:gnStr, priority:editPriority, memo });
 });
 
 /* ── Content detail modal ──────────────── */
@@ -740,8 +754,9 @@ document.getElementById('neta-form').addEventListener('submit', async e => {
   const btn = document.getElementById('save-btn');
   btn.disabled = true; btn.textContent = '保存中…';
   try {
-    await post({ action:'add', keyword:kw, genre, priority, memo:document.getElementById('memo').value.trim() });
-    pushRecent({ keyword:kw, genre }); netaReady = false;
+    const gnStr = genre.join('、') || 'その他';
+    await post({ action:'add', keyword:kw, genre:gnStr, priority, memo:document.getElementById('memo').value.trim() });
+    pushRecent({ keyword:kw, genre:gnStr }); netaReady = false;
     toast('✅ 保存しました！');
     if (navigator.vibrate) navigator.vibrate(10);
     document.getElementById('keyword').value = '';
