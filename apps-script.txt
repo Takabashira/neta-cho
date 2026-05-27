@@ -33,7 +33,26 @@ function doPost(e) {
       return updateRowField(sheet, 0, ts, 5, status);
     }
 
-    // ③ ネタ→コンテンツ化（Google Doc自動生成）
+    // ③ ネタを編集
+    if (action === 'updateNeta') {
+      const sheet   = getOrCreateNetaSheet(ss);
+      const ts      = (e.parameter.timestamp || '').trim();
+      const keyword = (e.parameter.keyword   || '').trim();
+      const genre   = (e.parameter.genre     || '').trim();
+      const prio    = (e.parameter.priority  || '').trim();
+      const memo    = (e.parameter.memo      || '');
+      if (!keyword) return jsonRes({ status: 'error', message: 'keyword required' });
+      const data = sheet.getDataRange().getValues();
+      for (let i = 1; i < data.length; i++) {
+        if (String(data[i][0]).trim() === ts) {
+          sheet.getRange(i + 1, 2, 1, 4).setValues([[keyword, genre, prio, memo]]);
+          return jsonRes({ status: 'ok' });
+        }
+      }
+      return jsonRes({ status: 'error', message: 'row not found' });
+    }
+
+    // ④ ネタ→コンテンツ化（Google Doc自動生成）
     if (action === 'createContent') {
       const keyword = (e.parameter.keyword || '').trim();
       const genre   = (e.parameter.genre   || '').trim();
