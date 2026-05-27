@@ -241,11 +241,11 @@
       <div class="field">
         <div class="field-label">ジャンル</div>
         <div class="pills" id="genre-pills">
-          <button type="button" class="pill selected" data-val="移住">移住</button>
-          <button type="button" class="pill" data-val="不動産">不動産</button>
-          <button type="button" class="pill" data-val="民泊">民泊</button>
-          <button type="button" class="pill" data-val="経営">経営</button>
-          <button type="button" class="pill" data-val="島暮らし">島暮らし</button>
+          <button type="button" class="pill selected" data-val="コインランドリー">コインランドリー</button>
+          <button type="button" class="pill" data-val="宿泊">宿泊</button>
+          <button type="button" class="pill" data-val="スポーツクラブ">スポーツクラブ</button>
+          <button type="button" class="pill" data-val="駐車場">駐車場</button>
+          <button type="button" class="pill" data-val="M&A">M&A</button>
           <button type="button" class="pill" data-val="その他">その他</button>
         </div>
       </div>
@@ -412,7 +412,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 });
 
 /* ── Pills ─────────────────────────────── */
-let genre = '移住', priority = '中';
+let genre = 'コインランドリー', priority = '中';
 const setupPills = (id, cb) => {
   document.getElementById(id).addEventListener('click', e => {
     const p = e.target.closest('.pill'); if (!p) return;
